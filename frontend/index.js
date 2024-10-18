@@ -1,5 +1,6 @@
 import { backend } from 'declarations/backend';
 import { Principal } from '@dfinity/principal';
+import { IDL } from '@dfinity/candid';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const uploadButton = document.getElementById('upload-button');
@@ -9,24 +10,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     uploadButton.addEventListener('click', async () => {
         const file = imageInput.files[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onloadend = async () => {
-                const arrayBuffer = reader.result;
-                const blob = new Blob([arrayBuffer], { type: file.type });
-                try {
-                    const result = await backend.uploadImage(blob, file.type);
-                    if (result.ok) {
-                        alert(`Image uploaded successfully! ID: ${result.ok}`);
-                        await loadImages();
-                    } else {
-                        alert(`Error uploading image: ${result.err}`);
-                    }
-                } catch (error) {
-                    console.error('Error uploading image:', error);
-                    alert('Error uploading image. Please try again.');
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const uint8Array = new Uint8Array(arrayBuffer);
+                const blob = IDL.blobFromUint8Array(uint8Array);
+                
+                const result = await backend.uploadImage(blob, file.type);
+                if (result.ok) {
+                    alert(`Image uploaded successfully! ID: ${result.ok}`);
+                    await loadImages();
+                } else {
+                    alert(`Error uploading image: ${result.err}`);
                 }
-            };
-            reader.readAsArrayBuffer(file);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                alert('Error uploading image. Please try again.');
+            }
         } else {
             alert('Please select an image to upload.');
         }
