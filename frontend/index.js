@@ -1,8 +1,11 @@
-import { backend } from 'declarations/backend';
+import { Actor, HttpAgent } from "@dfinity/agent";
 import { Principal } from '@dfinity/principal';
-import { IDL } from '@dfinity/candid';
 
 document.addEventListener('DOMContentLoaded', async () => {
+    const canisterId = process.env.CANISTER_ID_BACKEND;
+    const agent = new HttpAgent();
+    const backend = Actor.createActor(canisterId, { agent });
+
     const uploadButton = document.getElementById('upload-button');
     const imageInput = document.getElementById('image-input');
     const imageGallery = document.getElementById('image-gallery');
@@ -12,11 +15,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (file) {
             try {
                 const arrayBuffer = await file.arrayBuffer();
-                const uint8Array = new Uint8Array(arrayBuffer);
-                const blob = IDL.Vector(IDL.Nat8, uint8Array);
+                const blob = new Uint8Array(arrayBuffer);
                 
                 const result = await backend.uploadImage(blob, file.type);
-                if (result.ok) {
+                if ('ok' in result) {
                     alert(`Image uploaded successfully! ID: ${result.ok}`);
                     await loadImages();
                 } else {
