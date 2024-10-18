@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             try {
                 const arrayBuffer = await file.arrayBuffer();
                 const uint8Array = new Uint8Array(arrayBuffer);
-                const blob = IDL.Vec(IDL.Nat8).encode(uint8Array);
+                const blob = IDL.Vector(IDL.Nat8, uint8Array);
                 
                 const result = await backend.uploadImage(blob, file.type);
                 if (result.ok) {
