@@ -2,9 +2,17 @@ import { Actor, HttpAgent } from "@dfinity/agent";
 import { Principal } from '@dfinity/principal';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const canisterId = process.env.CANISTER_ID_BACKEND;
-    const agent = new HttpAgent();
-    const backend = Actor.createActor(canisterId, { agent });
+    const canisterId = import.meta.env.VITE_CANISTER_ID_BACKEND;
+    let backend;
+
+    try {
+        const agent = new HttpAgent();
+        backend = Actor.createActor(canisterId, { agent });
+    } catch (error) {
+        console.error("Failed to create actor:", error);
+        alert("Failed to initialize the application. Please check the console for more information.");
+        return;
+    }
 
     const uploadButton = document.getElementById('upload-button');
     const imageInput = document.getElementById('image-input');
@@ -60,9 +68,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         } catch (error) {
             console.error('Error loading images:', error);
+            alert('Failed to load images. Please check the console for more information.');
         }
     }
 
     // Load images when the page loads
-    await loadImages();
+    try {
+        await loadImages();
+    } catch (error) {
+        console.error("Failed to load images:", error);
+        alert("Failed to load images. Please check the console for more information.");
+    }
 });
