@@ -1,0 +1,20 @@
+type Time = int;
+type Result = 
+ variant {
+   err: text;
+   ok: text;
+ };
+type Image = 
+ record {
+   contentType: text;
+   createdAt: Time;
+   id: text;
+   owner: principal;
+   url: text;
+ };
+service : {
+  getImage: (text) -> (opt Image) query;
+  getImagesCount: () -> (nat) query;
+  listImages: () -> (vec Image) query;
+  uploadImage: (blob, text) -> (Result);
+}
